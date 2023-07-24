@@ -14,8 +14,6 @@ pipeline {
       steps {
         sh 'rm owasp* || true'
         sh 'wget "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json"'
-        sh 'wget "https://raw.githubusercontent.com/jeremylong/DependencyCheck/master/bin/dependency-check.sh"'
-        sh 'chmod +x owasp-dependency-check.sh'
         sh 'docker run --rm -v "$PWD:/report" owasp/dependency-check --scan /report --format "XML" --out /report/dependency-check-report.xml'
         sh 'cat dependency-check-report.xml'
       }
