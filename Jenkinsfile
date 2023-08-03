@@ -1,16 +1,10 @@
 pipeline {
     agent any
-    environment {
-        // Définir ici les variables d'environnement nécessaires pour votre application Fintech
-        // Par exemple, les clés d'API, les identifiants, etc.
-        FOO_API_KEY = credentials('foo-api-key') // Exemple de variable d'environnement pour stocker une clé d'API dans un secret Jenkins
-    }
     stages {
         stage('Initialize') {
             steps {
                 sh '''
                     echo "Initializing CI/CD pipeline..."
-                    echo "FOO_API_KEY = ${FOO_API_KEY}"
                     echo "PATH = ${PATH}"
                     echo "M2_HOME = ${M2_HOME}"
                     // Vous pouvez mettre ici des commandes d'initialisation supplémentaires si nécessaire
