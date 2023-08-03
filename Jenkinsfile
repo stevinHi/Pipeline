@@ -15,9 +15,9 @@ pipeline {
 
         stage('Source Composition Analysis') {
             steps {
-                sh 'sudo mkdir /report'
-                sh 'sudo chown -R jenkins:jenkins /report'
-                sh 'sudo chown -R jenkins:docker /report'
+                sh 'mkdir /report'
+                sh 'chown -R jenkins:jenkins /report'
+                sh 'chown -R jenkins:docker /report'
                 // Analyse de composition des sources, détection de vulnérabilités, etc.
                 sh 'rm owasp* || true'
                 sh 'wget "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json"'
