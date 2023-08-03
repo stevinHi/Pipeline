@@ -1,16 +1,14 @@
 pipeline {
     agent any
     stages {
-        stage('Initialize') {
-            steps {
-                sh '''
-                    echo "Initializing CI/CD pipeline..."
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                    // Vous pouvez mettre ici des commandes d'initialisation supplémentaires si nécessaire
-                '''
-            }
-        }
+    stage('Initialize') {
+      steps {
+        sh '''
+          echo "PATH = ${PATH}"
+          echo "M2_HOME = ${M2_HOME}"
+        '''
+      }
+    }
 
         stage('Source Composition Analysis') {
             steps {
