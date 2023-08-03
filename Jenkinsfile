@@ -3,6 +3,9 @@ pipeline {
     stages {
     stage('Initialize') {
       steps {
+        sh 'rm -f cloc.xml'
+        sh 'rm -f sloccount.sc'
+        sh 'rm -f cpd.xml'    
         sh '''
           echo "PATH = ${PATH}"
           echo "M2_HOME = ${M2_HOME}"
@@ -12,6 +15,9 @@ pipeline {
 
         stage('Source Composition Analysis') {
             steps {
+                sh 'sudo mkdir /report'
+                sh 'sudo chown -R jenkins:jenkins /report'
+                sh 'sudo chown -R jenkins:docker /report'
                 // Analyse de composition des sources, détection de vulnérabilités, etc.
                 sh 'rm owasp* || true'
                 sh 'wget "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json"'
@@ -42,10 +48,25 @@ pipeline {
             }
         }
 
-        stage('Build') {
+ stage('Build Frontend') {
             steps {
-                // Exemple de commandes pour effectuer le build de l'application avec Maven pour une application Java
-                sh 'mvn clean package'
+                dir('MobileInvoice') {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+            }
+        }
+        
+        stage('Create Symbolic Link') {
+            steps {
+                sh 'rm phing || true'
+                sh 'ln -s ./MobileInvoice/vendor/bin/phing phing'
+            }
+        }
+        
+        stage('Full Build with Phing') {
+            steps {
+                sh './phing -buildfile /var/lib/jenkins/jobs/OrangeMoney-MobileInvoice-Test/workspace/MobileInvoice/build.xml full-build'
             }
         }
 
@@ -57,15 +78,25 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Remote Server') {
             steps {
-                // Exemple de commandes pour déployer l'application sur un environnement de staging
-                // Assurez-vous que l'accès au serveur de staging est sécurisé (VPN, pare-feu, etc.)
-                sshagent(['your-ssh-credentials-id']) {
-                    sh 'scp target/your-app.jar user@staging-server:/path/to/deploy'
-                    sh 'ssh user@staging-server "java -jar /path/to/deploy/your-app.jar"'
-                }
+                sh 'ssh-keyscan -t rsa,dsa 213.32.14.59 >> ~/.ssh/known_hosts'
+                sh 'ssh jenkins@213.32.14.59 << EOF\n' +
+                    'cd /home/jenkins/MobileInvoiceTest/OrangeMoney/MobileInvoice/\n' +
+                    'git reset --hard HEAD\n' +
+                    'git checkout develop\n' +
+                    'git fetch\n' +
+                    'git reset --hard HEAD\n' +
+                    'git merge origin/develop\n' +
+                    'cd /home/jenkins/MobileInvoiceTest/OrangeMoney/MobileInvoice/\n' +
+                    'mv docker-compose-dev.yml docker-compose.yml\n' +
+                    'sudo su\n' +
+                    'docker-compose down\n' +
+                    'docker-compose up -d\n' +
+                    'exit\n' +
+                    'EOF'
             }
+        }
         }
 
         stage('WAF - Web Application Firewall') {
