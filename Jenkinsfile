@@ -1,17 +1,17 @@
 pipeline {
     agent any
     stages {
-    stage('Initialize') {
-      steps {
-        sh 'rm -f cloc.xml'
-        sh 'rm -f sloccount.sc'
-        sh 'rm -f cpd.xml'    
-        sh '''
-          echo "PATH = ${PATH}"
-          echo "M2_HOME = ${M2_HOME}"
-        '''
-      }
-    }
+        stage('Initialize') {
+            steps {
+                sh 'rm -f cloc.xml'
+                sh 'rm -f sloccount.sc'
+                sh 'rm -f cpd.xml'    
+                sh '''
+                    echo "PATH = ${PATH}"
+                    echo "M2_HOME = ${M2_HOME}"
+                '''
+            }
+        }
 
         stage('Source Composition Analysis') {
             steps {
@@ -23,7 +23,7 @@ pipeline {
                 sh 'wget "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json"'
                 sh 'docker run --rm -v "$PWD:/report" owasp/dependency-check --scan /report --format "XML" --out /report/dependency-check-report.xml'
                 // Ignorer les erreurs pour ne pas arrêter le pipeline en cas de vulnérabilités
-                sh 'cat dependency-check-report.xml || true'
+                sh 'cat /report/dependency-check-report.xml || true'
             }
         }
 
@@ -48,7 +48,7 @@ pipeline {
             }
         }
 
- stage('Build Frontend') {
+        stage('Build Frontend') {
             steps {
                 dir('MobileInvoice') {
                     sh 'npm install'
@@ -97,8 +97,7 @@ pipeline {
                     'EOF'
             }
         }
-        }
-
+        
         stage('WAF - Web Application Firewall') {
             steps {
                 // Configuration du WAF pour protéger l'application Web
@@ -143,5 +142,6 @@ pipeline {
         }
     }
 }
+
 
 
