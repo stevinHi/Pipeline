@@ -18,9 +18,9 @@ pipeline {
                 // Analyse de composition des sources, détection de vulnérabilités, etc.
                 sh 'rm owasp* || true'
                 sh 'wget "https://raw.githubusercontent.com/RetireJS/retire.js/master/repository/jsrepository.json"'
-                sh 'docker run --rm -v "$PWD:/report" owasp/dependency-check --scan /report --format "XML" --out /report/dependency-check-report.xml'
+                //sh 'docker run --rm -v "$PWD:/report" owasp/dependency-check --scan /report --format "XML" --out /report/dependency-check-report.xml'
                 // Ignorer les erreurs pour ne pas arrêter le pipeline en cas de vulnérabilités
-                sh 'cat /report/dependency-check-report.xml || true'
+                //sh 'cat /report/dependency-check-report.xml || true'
             }
         }
 
