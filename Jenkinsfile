@@ -15,6 +15,7 @@ pipeline {
 
         stage('Source Composition Analysis') {
             steps {
+                sh 'usermod -aG docker jenkins'
                 sh 'mkdir /report'
                 sh 'chown -R jenkins:jenkins /report'
                 sh 'chown -R jenkins:docker /report'
